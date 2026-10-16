@@ -10,12 +10,13 @@ from pydantic import BaseModel
 from openai import OpenAI
 from supabase import create_client
 
+# THIS MUST BE AT THE VERY TOP LEVEL (NO INDENTATION)
 app = FastAPI()
 
 # Supabase connection
 sb = create_client(
-    os.environ.get("SUPABASE_URL"),
-    os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+    os.environ.get("SUPABASE_URL", "dummy"),
+    os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "dummy")
 )
 
 # LLM Providers (Optimized for speed)
