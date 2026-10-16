@@ -1,3 +1,4 @@
+# Force new deploy v2
 import json
 import os
 import re
@@ -10,16 +11,13 @@ from pydantic import BaseModel
 from openai import OpenAI
 from supabase import create_client
 
-# THIS MUST BE AT THE VERY TOP LEVEL (NO INDENTATION)
 app = FastAPI()
 
-# Supabase connection
 sb = create_client(
     os.environ.get("SUPABASE_URL", "dummy"),
     os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "dummy")
 )
 
-# LLM Providers (Optimized for speed)
 PROVIDERS = [
     {"name": "groq", "base_url": "https://api.groq.com/openai/v1", "key_env": "GROQ_API_KEY", "model": "llama-3.3-70b-versatile"},
     {"name": "gemini", "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/", "key_env": "GEMINI_API_KEY", "model": "gemini-2.0-flash"},
@@ -38,10 +36,8 @@ def call_llm(messages):
     return "error", "All LLM providers failed."
 
 def build_system_prompt():
-    # Fetch top instincts
     instincts = sb.table("instincts").select("trigger_pattern, learned_rule").gte("confidence", 0.7).limit(3).execute().data
     instinct_block = "\n".join([f"- WHEN {i['trigger_pattern']} -> {i['learned_rule']}" for i in instincts]) if instincts else "- (none learned yet)"
-    
     return f"""You are ECC-Master. Follow ECC Doctrine: Research first, use TDD, secure code, be concise.
 LEARNED INSTINCTS:
 {instinct_block}
