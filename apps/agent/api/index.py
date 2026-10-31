@@ -4,7 +4,7 @@ import os
 import re
 import subprocess
 
-from fastapi import Depends, FastAPI, Header, HTTPException
+   from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from openai import OpenAI
@@ -206,3 +206,13 @@ def get_job(job_id: str):
         .data
     )
     return {"job": job, "logs": logs}
+
+
+@app.get("/{full_path:path}")
+def debug_catch_all(full_path: str, request: Request):
+    return {
+        "received_path": full_path,
+        "scope_path": request.scope.get("path"),
+        "root_path": request.scope.get("root_path"),
+        "url": str(request.url),
+    }
